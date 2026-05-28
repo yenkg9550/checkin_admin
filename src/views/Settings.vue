@@ -1,10 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { fetchSettings, updateSettings } from '@/api/http.js'
 import { ElMessage } from 'element-plus'
 
-const router  = useRouter()
 const loading = ref(false)
 const saving  = ref(false)
 
@@ -47,12 +45,9 @@ function openMap() {
 </script>
 
 <template>
-  <div class="settings-page" v-loading="loading">
+  <div class="settings-page" v-loading="loading" element-loading-background="transparent">
     <div class="page-header">
-      <div class="header-left">
-        <button class="back-btn" @click="router.push({ name: 'dashboard' })">← 回首頁</button>
-        <h2 class="page-title">系統設定</h2>
-      </div>
+      <h2 class="page-title">GPS 設定</h2>
     </div>
 
     <div class="card-wrap">
@@ -148,24 +143,12 @@ function openMap() {
 
 <style scoped>
 .settings-page {
-  min-height: 100vh;
+  flex: 1;
   background: #0f172a;
-  padding: 32px 36px;
+  padding: 28px 32px;
   box-sizing: border-box;
 }
-.page-header {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 24px;
-}
-.header-left { display: flex; align-items: center; gap: 14px; }
-.back-btn {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #94a3b8; border-radius: 8px;
-  padding: 6px 14px; font-size: 13px;
-  cursor: pointer; transition: background .15s, color .15s;
-}
-.back-btn:hover { background: rgba(255,255,255,0.12); color: #f1f5f9; }
+.page-header { margin-bottom: 24px; }
 .page-title { font-size: 20px; font-weight: 700; color: #f1f5f9; margin: 0; }
 
 .card-wrap {
@@ -191,7 +174,7 @@ function openMap() {
   margin-bottom: 4px;
 }
 .section-desc {
-  font-size: 12px;
+  font-size: 13px;
   color: #64748b;
   margin-bottom: 16px;
 }
@@ -206,7 +189,7 @@ function openMap() {
 /* 位置輸入 */
 .field-row { display: flex; gap: 12px; margin-bottom: 12px; }
 .field { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.field label { font-size: 12px; color: #94a3b8; font-weight: 500; }
+.field label { font-size: 13px; color: #94a3b8; font-weight: 500; }
 
 .map-btn {
   background: transparent;
@@ -214,7 +197,7 @@ function openMap() {
   color: #60a5fa;
   padding: 7px 14px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   transition: background .15s;
 }
@@ -236,11 +219,8 @@ function openMap() {
 
 /* RWD */
 @media (max-width: 768px) {
-  .settings-page { padding: 20px 14px 100px; }
+  .settings-page { padding: 16px 14px; }
   .page-title { font-size: 17px; }
   .field-row { flex-direction: column; }
-}
-@media (max-width: 375px) {
-  .settings-page { padding: 16px 10px 100px; }
 }
 </style>

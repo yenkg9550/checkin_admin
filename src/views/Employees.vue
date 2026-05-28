@@ -1,10 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { fetchEmployees } from '@/api/http.js'
 import { ElMessage } from 'element-plus'
 
-const router = useRouter()
 const employees = ref([])
 const loading = ref(false)
 
@@ -32,17 +30,11 @@ function formatDate(iso) {
 <template>
   <div class="emp-page">
     <div class="page-header">
-      <div class="header-left">
-        <button class="back-btn" @click="router.push({ name: 'dashboard' })">← 回首頁</button>
-        <h2 class="page-title">員工管理</h2>
-      </div>
-      <el-button size="small" :loading="loading" @click="loadEmployees" circle>
-        <el-icon><Refresh /></el-icon>
-      </el-button>
+      <h2 class="page-title">員工管理</h2>
     </div>
 
     <!-- 桌機表格 -->
-    <div class="emp-table-wrap desktop-table" v-loading="loading">
+    <div class="emp-table-wrap desktop-table" v-loading="loading" element-loading-background="transparent">
       <table class="emp-table">
         <thead>
           <tr>
@@ -77,7 +69,7 @@ function formatDate(iso) {
     </div>
 
     <!-- 手機卡片 -->
-    <div class="mobile-cards" v-loading="loading">
+    <div class="mobile-cards" v-loading="loading" element-loading-background="transparent">
       <div v-if="!loading && employees.length === 0" class="empty-row">尚無員工資料</div>
       <div v-for="emp in employees" :key="emp.id" class="emp-card">
         <div class="card-left">
@@ -98,24 +90,12 @@ function formatDate(iso) {
 
 <style scoped>
 .emp-page {
-  min-height: 100vh;
+  flex: 1;
   background: #0f172a;
-  padding: 32px 36px;
+  padding: 28px 32px;
   box-sizing: border-box;
 }
-.page-header {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 20px;
-}
-.header-left { display: flex; align-items: center; gap: 14px; }
-.back-btn {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #94a3b8; border-radius: 8px;
-  padding: 6px 14px; font-size: 13px;
-  cursor: pointer; transition: background .15s, color .15s;
-}
-.back-btn:hover { background: rgba(255,255,255,0.12); color: #f1f5f9; }
+.page-header { margin-bottom: 20px; }
 .page-title { font-size: 20px; font-weight: 700; color: #f1f5f9; margin: 0; }
 
 /* ── 桌機表格 ── */
@@ -123,11 +103,11 @@ function formatDate(iso) {
   background: #1e293b; border-radius: 12px;
   overflow: hidden; border: 1px solid rgba(255,255,255,0.08); min-height: 200px;
 }
-.emp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.emp-table { width: 100%; border-collapse: collapse; font-size: 16px; }
 .emp-table thead tr { background: #0f172a; }
 .emp-table th {
   padding: 12px 16px; text-align: left; color: #94a3b8;
-  font-weight: 600; font-size: 12px; letter-spacing: .05em;
+  font-weight: 600; font-size: 13px; letter-spacing: .05em;
   text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .emp-table tbody tr {
@@ -147,7 +127,7 @@ function formatDate(iso) {
 }
 .emp-name { font-weight: 600; color: #e2e8f0; }
 .mono {
-  font-family: monospace; font-size: 11px; color: #64748b;
+  font-family: monospace; font-size: 13px; color: #64748b;
   max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .empty-row { text-align: center; color: #475569; padding: 40px; }
@@ -162,7 +142,7 @@ function formatDate(iso) {
 }
 .card-left { display: flex; align-items: center; gap: 12px; }
 .card-info { min-width: 0; }
-.card-date { font-size: 11px; color: #475569; margin-top: 2px; }
+.card-date { font-size: 13px; color: #475569; margin-top: 2px; }
 
 /* ── RWD ── */
 @media (max-width: 768px) {

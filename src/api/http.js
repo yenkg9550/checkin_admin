@@ -35,3 +35,9 @@ export const fetchSettings      = ()       => http.get('/admin/settings').then(r
 export const updateSettings     = (data)   => http.put('/admin/settings', data).then(r => r.data)
 export const exportMonthly      = (year, month) =>
   http.get('/admin/export/monthly', { params: { year, month }, responseType: 'blob' }).then(r => r.data)
+
+// ── 管理員帳號管理 ────────────────────────────────────────────────────────
+export const fetchAdmins         = ()                 => http.get('/admin/admins').then(r => r.data)
+export const createAdmin         = (payload)          => http.post('/admin/admins', payload).then(r => r.data)
+export const deleteAdmin         = (id)               => http.delete(`/admin/admins/${id}`).then(r => r.data)
+export const changeAdminPassword = (id, new_password) => http.put(`/admin/admins/${id}/password`, { new_password }).then(r => r.data)

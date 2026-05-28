@@ -20,7 +20,7 @@ async function handleLogin() {
   error.value = ''
   try {
     const data = await postAdminLogin(form.value.username, form.value.password)
-    auth.setAuth(data.access_token, { role: 'admin', display_name: form.value.username })
+    auth.setAuth(data.access_token, data.user)
     await router.replace({ name: 'dashboard' })
   } catch (e) {
     error.value = e?.response?.data?.detail || '帳號或密碼錯誤'

@@ -1,12 +1,18 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { fetchDailyReport, fetchEmployees, clearAllAttendance, exportMonthly } from '@/api/http.js'
+import { fetchDailyReport, fetchEmployees, clearAllAttendance } from '@/api/http.js'
 import { useAuthStore } from '@/stores/auth.js'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const auth   = useAuthStore()
 const router = useRouter()
+const route  = useRoute()
+
+// ── 系統設定子選單 ──────────────────────────────────────────
+const settingsOpen   = ref(false)
+const isSettingsRoute = computed(() => route.path.startsWith('/settings') || route.path === '/export')
+watch(isSettingsRoute, v => { if (v) settingsOpen.value = true }, { immediate: true })
 const rawRecords = ref([])
 const employees  = ref([])
 const loading    = ref(true)
@@ -67,25 +73,6 @@ function handleLogout() {
   router.replace({ name: 'login' })
 }
 
-const exporting = ref(false)
-async function handleExport() {
-  exporting.value = true
-  try {
-    const [y, m] = selectedDate.value.split('-').map(Number)
-    const blob = await exportMonthly(y, m)
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = `打卡記錄_${y}年${m}月.xlsx`
-    a.click()
-    URL.revokeObjectURL(url)
-    ElMessage.success('匯出成功')
-  } catch {
-    ElMessage.error('匯出失敗')
-  } finally {
-    exporting.value = false
-  }
-}
 </script>
 
 <template>
@@ -104,8 +91,26 @@ async function handleExport() {
         <router-link to="/employees" class="nav-item" active-class="active">
           <el-icon><User /></el-icon> 員工管理
         </router-link>
-        <router-link to="/settings" class="nav-item" active-class="active">
-          <el-icon><Setting /></el-icon> 系統設定
+
+        <!-- 系統設定（可展開） -->
+        <div class="nav-item nav-toggle" :class="{ active: isSettingsRoute }" @click="settingsOpen = !settingsOpen">
+          <el-icon><Setting /></el-icon>
+          <span>系統設定</span>
+          <el-icon class="chevron" :class="{ open: settingsOpen }"><ArrowRight /></el-icon>
+        </div>
+        <transition name="sub-fade">
+          <div v-if="settingsOpen" class="nav-sub">
+            <router-link to="/settings" class="nav-sub-item" active-class="sub-active">
+              <el-icon><Location /></el-icon> GPS 設定
+            </router-link>
+            <router-link to="/export" class="nav-sub-item" active-class="sub-active">
+              <el-icon><Download /></el-icon> 匯出記錄
+            </router-link>
+          </div>
+        </transition>
+
+        <router-link to="/admins" class="nav-item" active-class="active">
+          <el-icon><Avatar /></el-icon> 管理設定
         </router-link>
       </nav>
       <div class="sidebar-footer">
@@ -138,12 +143,8 @@ async function handleExport() {
               <el-icon><Refresh /></el-icon>
             </el-button>
           </div>
-          <!-- 匯出 + 清除（獨立一行，手機也同） -->
+          <!-- 清除記錄 -->
           <div class="toolbar-row">
-            <el-button type="success" plain size="default" :loading="exporting" @click="handleExport" style="flex:1">
-              <el-icon><Download /></el-icon>
-              <span style="margin-left:4px">匯出當月</span>
-            </el-button>
             <el-button type="danger" plain size="default" @click="handleClear" style="flex:1">
               <el-icon><Delete /></el-icon>
               <span style="margin-left:4px">清除記錄</span>
@@ -246,36 +247,61 @@ async function handleExport() {
 /* ── 版面 ───────────────────────────────────────────────────────────── */
 .layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background: #f8fafc;
+  overflow: hidden;
 }
 
 /* ── 側欄（桌機）───────────────────────────────────────────────────── */
 .sidebar {
-  width: 220px;
+  width: 230px;
   background: #1e293b;
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .brand {
   display: flex; align-items: center; gap: 10px;
-  color: #f8fafc; font-size: 16px; font-weight: 700;
+  color: #f8fafc; font-size: 17px; font-weight: 700;
   margin-bottom: 32px; padding: 0 8px;
+  flex-shrink: 0;
 }
-.nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.nav { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; overflow-x: hidden; }
 .nav-item {
   display: flex; align-items: center; gap: 10px;
   color: #94a3b8; text-decoration: none;
-  padding: 10px 12px; border-radius: 10px;
-  font-size: 14px; transition: all .15s;
+  padding: 11px 12px; border-radius: 10px;
+  font-size: 16px; transition: all .15s;
+  cursor: pointer; user-select: none;
 }
 .nav-item:hover { background: #334155; color: #f8fafc; }
 .nav-item.active { background: #3b82f6; color: #fff; }
+
+/* 展開子選單 */
+.nav-toggle { justify-content: flex-start; }
+.nav-toggle .chevron { margin-left: auto; transition: transform .2s; flex-shrink: 0; }
+.nav-toggle .chevron.open { transform: rotate(90deg); }
+.nav-sub {
+  display: flex; flex-direction: column; gap: 2px;
+  padding-left: 14px; margin-top: 2px;
+}
+.nav-sub-item {
+  display: flex; align-items: center; gap: 8px;
+  color: #64748b; text-decoration: none;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 15px; transition: all .15s;
+}
+.nav-sub-item:hover { background: #334155; color: #cbd5e1; }
+.nav-sub-item.sub-active { background: rgba(59,130,246,0.2); color: #60a5fa; font-weight: 600; }
+.sub-fade-enter-active, .sub-fade-leave-active { transition: opacity .15s, transform .15s; }
+.sub-fade-enter-from, .sub-fade-leave-to { opacity: 0; transform: translateY(-4px); }
+
 .sidebar-footer {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 8px; border-top: 1px solid #334155; margin-top: 16px;
+  flex-shrink: 0;
 }
 .avatar, .avatar-ph {
   width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
@@ -286,8 +312,8 @@ async function handleExport() {
   font-size: 14px; font-weight: 700;
 }
 .footer-info { flex: 1; min-width: 0; }
-.footer-name { font-size: 13px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.footer-role { font-size: 11px; color: #64748b; }
+.footer-name { font-size: 14px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.footer-role { font-size: 12px; color: #64748b; }
 
 /* ── 主內容 ─────────────────────────────────────────────────────────── */
 .content {
@@ -318,7 +344,7 @@ async function handleExport() {
 }
 .stat-card { border-radius: 14px; padding: 16px; color: #fff; }
 .stat-num  { font-size: 28px; font-weight: 800; line-height: 1; }
-.stat-label { font-size: 12px; opacity: .85; margin-top: 4px; }
+.stat-label { font-size: 13px; opacity: .85; margin-top: 4px; }
 
 /* ── 打卡卡片 ───────────────────────────────────────────────────────── */
 .record-list { display: flex; flex-direction: column; gap: 10px; }
@@ -349,7 +375,7 @@ async function handleExport() {
   display: flex; flex-direction: column;
   align-items: center; gap: 2px; min-width: 52px;
 }
-.tl { font-size: 10px; color: #94a3b8; }
+.tl { font-size: 12px; color: #94a3b8; }
 .tv { font-size: 15px; font-weight: 700; color: #1e293b; }
 .tv.dim { color: #cbd5e1; }
 .tdiv { width: 1px; height: 32px; background: #f1f5f9; }
@@ -358,7 +384,7 @@ async function handleExport() {
 .mobile-time-item {
   display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center;
 }
-.mobile-time-item .tl { font-size: 11px; color: #94a3b8; }
+.mobile-time-item .tl { font-size: 12px; color: #94a3b8; }
 .mobile-time-item .tv { font-size: 15px; font-weight: 700; color: #1e293b; }
 .tdiv-v { width: 1px; height: 24px; background: #f1f5f9; }
 
@@ -380,7 +406,7 @@ async function handleExport() {
     align-items: center; justify-content: center;
     gap: 3px; padding: 10px 0;
     color: #64748b; text-decoration: none;
-    font-size: 11px; background: none; border: none; cursor: pointer;
+    font-size: 12px; background: none; border: none; cursor: pointer;
     transition: color .15s;
   }
   .bn-item:hover, .bn-item.bn-active { color: #3b82f6; }
