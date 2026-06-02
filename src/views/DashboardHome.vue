@@ -1,22 +1,32 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { fetchDailyReport, fetchEmployees, clearAllAttendance } from '@/api/http.js'
+import { fetchDailyReport, fetchEmployees, clearAllAttendance, fetchSchedules } from '@/api/http.js'
 
-const rawRecords   = ref([])
-const employees    = ref([])
-const loading      = ref(true)
-const selectedDate = ref(new Date().toISOString().slice(0, 10))
+const rawRecords      = ref([])
+const employees       = ref([])
+const scheduledEmpIds = ref(new Set())
+const loading         = ref(true)
+const selectedDate    = ref(new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10))
 
 onMounted(() => loadAll())
 
 async function loadAll() {
   loading.value = true
   try {
-    [rawRecords.value, employees.value] = await Promise.all([
-      fetchDailyReport(selectedDate.value),
+    const dateStr = selectedDate.value
+    const [y, m] = dateStr.split('-').map(Number)
+    const [records, emps, schedules] = await Promise.all([
+      fetchDailyReport(dateStr),
       fetchEmployees(),
+      fetchSchedules(y, m),
     ])
+    rawRecords.value  = records
+    employees.value   = emps
+    // 當天有排班的員工 ID
+    scheduledEmpIds.value = new Set(
+      schedules.filter(s => s.work_date === dateStr).map(s => s.employee_id)
+    )
   } finally { loading.value = false }
 }
 
@@ -30,7 +40,10 @@ const rows = computed(() => {
     if (r.check_type === 'clock_in')  map[r.employee_id].clock_in  = r
     if (r.check_type === 'clock_out') map[r.employee_id].clock_out = r
   }
-  return Object.values(map)
+  return Object.values(map).map(row => ({
+    ...row,
+    unscheduled: !scheduledEmpIds.value.has(row.employee_id),
+  }))
 })
 
 const presentCount = computed(() => rows.value.filter(r => r.clock_in).length)
@@ -38,8 +51,10 @@ const absentCount  = computed(() => employees.value.length - presentCount.value)
 
 function fmt(dt) {
   if (!dt) return '—'
-  const d = new Date(dt.endsWith('Z') ? dt : dt + 'Z')
-  return d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })
+  // checked_at 是 UTC 儲存，固定加 8h 轉台灣時間
+  const d = new Date((dt.endsWith('Z') ? dt : dt + 'Z'))
+  const tw = new Date(d.getTime() + 8 * 3600 * 1000)
+  return tw.toISOString().slice(11, 16)
 }
 function rowStatus(row) {
   if (row.clock_in && row.clock_out) return { label: '已完成', type: 'success' }
@@ -110,16 +125,17 @@ async function handleClear() {
     <el-empty v-else-if="!rows.length" description="當日無打卡紀錄" />
 
     <div v-else class="record-list">
-      <div v-for="row in rows" :key="row.employee_id" class="record-card">
+      <div v-for="row in rows" :key="row.employee_id" class="record-card" :class="{ 'card-anomaly': row.unscheduled }">
         <div class="rec-top">
           <div class="rec-left">
             <img v-if="row.picture_url" :src="row.picture_url" class="rec-avatar" referrerpolicy="no-referrer" />
             <div class="rec-ph" v-else>{{ row.display_name?.[0] }}</div>
             <div>
               <div class="rec-name">{{ row.display_name }}</div>
-              <el-tag :type="rowStatus(row).type" size="small" style="margin-top:3px;">
-                {{ rowStatus(row).label }}
-              </el-tag>
+              <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                <el-tag :type="rowStatus(row).type" size="small">{{ rowStatus(row).label }}</el-tag>
+                <el-tag v-if="row.unscheduled" type="danger" size="small">⚠ 未排班打卡</el-tag>
+              </div>
             </div>
           </div>
           <div class="desktop-times">
@@ -154,8 +170,9 @@ async function handleClear() {
 .dashboard-home {
   flex: 1;
   padding: 28px;
-  background: #f8fafc;
+  background: var(--bg-app);
   box-sizing: border-box;
+  transition: background .2s;
 }
 
 .toolbar {
@@ -164,7 +181,7 @@ async function handleClear() {
   flex-wrap: wrap; gap: 12px;
   margin-bottom: 20px;
 }
-.page-title { font-size: 20px; font-weight: 800; color: #1e293b; margin: 0; }
+.page-title { font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0; transition: color .2s; }
 .toolbar-actions { display: flex; flex-direction: column; gap: 8px; }
 .toolbar-row { display: flex; align-items: center; gap: 8px; }
 .date-picker { width: 160px; }
@@ -176,13 +193,14 @@ async function handleClear() {
 }
 .stat-card { border-radius: 14px; padding: 16px; color: #fff; }
 .stat-num  { font-size: 28px; font-weight: 800; line-height: 1; }
-.stat-label { font-size: 13px; opacity: .85; margin-top: 4px; }
+.stat-label { font-size: 16px; opacity: .85; margin-top: 4px; }
 
-.record-list { display: flex; flex-direction: column; gap: 10px; }
+.record-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .record-card {
-  background: #fff; border-radius: 14px;
+  background: var(--bg-card); border-radius: 14px;
   padding: 14px 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  transition: background .2s;
 }
 .rec-top { display: flex; align-items: center; justify-content: space-between; }
 .rec-left { display: flex; align-items: center; gap: 12px; }
@@ -193,19 +211,20 @@ async function handleClear() {
   display: grid; place-items: center;
   font-size: 16px; font-weight: 700; flex-shrink: 0;
 }
-.rec-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+.rec-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.card-anomaly { border: 1.5px solid rgba(239,68,68,.4); background: rgba(239,68,68,.05) !important; }
 
 .desktop-times { display: flex; align-items: center; gap: 12px; }
 .mobile-times  { display: none; }
 .time-item { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 52px; }
-.tl { font-size: 12px; color: #94a3b8; }
-.tv { font-size: 15px; font-weight: 700; color: #1e293b; }
-.tv.dim { color: #cbd5e1; }
-.tdiv { width: 1px; height: 32px; background: #f1f5f9; }
+.tl { font-size: 16px; color: var(--text-muted); }
+.tv { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.tv.dim { color: var(--text-muted); }
+.tdiv { width: 1px; height: 32px; background: var(--divider); }
 .mobile-time-item { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
-.mobile-time-item .tl { font-size: 12px; color: #94a3b8; }
-.mobile-time-item .tv { font-size: 15px; font-weight: 700; color: #1e293b; }
-.tdiv-v { width: 1px; height: 24px; background: #f1f5f9; }
+.mobile-time-item .tl { font-size: 16px; color: var(--text-muted); }
+.mobile-time-item .tv { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.tdiv-v { width: 1px; height: 24px; background: var(--divider); }
 
 @media (max-width: 768px) {
   .dashboard-home { padding: 16px 12px; }
@@ -216,12 +235,13 @@ async function handleClear() {
   .stat-row { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
   .stat-card { padding: 12px; border-radius: 12px; }
   .stat-num  { font-size: 24px; }
+  .record-list { grid-template-columns: 1fr; }
   .record-card { padding: 12px; }
   .desktop-times { display: none; }
-  .mobile-times { display: flex; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+  .mobile-times { display: flex; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--divider); }
 }
 @media (max-width: 375px) {
   .stat-num { font-size: 22px; }
-  .rec-name { font-size: 13px; }
+  .rec-name { font-size: 16px; }
 }
 </style>

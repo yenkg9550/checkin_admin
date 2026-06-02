@@ -4,6 +4,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { fetchDailyReport, fetchEmployees, clearAllAttendance } from '@/api/http.js'
 import { useAuthStore } from '@/stores/auth.js'
 import { useRouter, useRoute } from 'vue-router'
+import { useTheme } from '@/composables/theme.js'
+
+const { isDark, toggleTheme } = useTheme()
 
 const auth   = useAuthStore()
 const router = useRouter()
@@ -16,7 +19,7 @@ watch(isSettingsRoute, v => { if (v) settingsOpen.value = true }, { immediate: t
 const rawRecords = ref([])
 const employees  = ref([])
 const loading    = ref(true)
-const selectedDate = ref(new Date().toISOString().slice(0, 10))
+const selectedDate = ref(new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10))
 
 onMounted(() => loadAll())
 
@@ -104,7 +107,7 @@ function handleLogout() {
               <el-icon><Location /></el-icon> GPS 設定
             </router-link>
             <router-link to="/export" class="nav-sub-item" active-class="sub-active">
-              <el-icon><Download /></el-icon> 匯出記錄
+              <el-icon><Download /></el-icon> 出勤匯出
             </router-link>
           </div>
         </transition>
@@ -120,7 +123,7 @@ function handleLogout() {
           <div class="footer-name">{{ auth.displayName }}</div>
           <div class="footer-role">管理員</div>
         </div>
-        <el-button text @click="handleLogout"><el-icon><SwitchButton /></el-icon></el-button>
+        <el-button text class="icon-btn" @click="handleLogout"><el-icon><SwitchButton /></el-icon></el-button>
       </div>
     </aside>
 
@@ -131,6 +134,11 @@ function handleLogout() {
       <div class="toolbar">
         <h1 class="page-title">出勤管理</h1>
         <div class="toolbar-actions">
+          <div class="toolbar-row" style="justify-content:flex-end">
+            <el-button text class="theme-btn" @click="toggleTheme" :title="isDark ? '切換淺色' : '切換深色'">
+              <el-icon :size="18"><Sunny v-if="isDark" /><Moon v-else /></el-icon>
+            </el-button>
+          </div>
           <!-- 日期 + 重新整理（同一行） -->
           <div class="toolbar-row">
             <el-date-picker
@@ -248,8 +256,9 @@ function handleLogout() {
 .layout {
   display: flex;
   height: 100vh;
-  background: #f8fafc;
+  background: var(--bg-app);
   overflow: hidden;
+  transition: background .2s;
 }
 
 /* ── 側欄（桌機）───────────────────────────────────────────────────── */
@@ -291,7 +300,7 @@ function handleLogout() {
   display: flex; align-items: center; gap: 8px;
   color: #64748b; text-decoration: none;
   padding: 9px 12px; border-radius: 8px;
-  font-size: 15px; transition: all .15s;
+  font-size: 16px; transition: all .15s;
 }
 .nav-sub-item:hover { background: #334155; color: #cbd5e1; }
 .nav-sub-item.sub-active { background: rgba(59,130,246,0.2); color: #60a5fa; font-weight: 600; }
@@ -309,11 +318,11 @@ function handleLogout() {
 .avatar-ph {
   background: #3b82f6; color: #fff;
   display: grid; place-items: center;
-  font-size: 14px; font-weight: 700;
+  font-size: 16px; font-weight: 700;
 }
 .footer-info { flex: 1; min-width: 0; }
-.footer-name { font-size: 14px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.footer-role { font-size: 12px; color: #64748b; }
+.footer-name { font-size: 16px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.footer-role { font-size: 16px; color: #64748b; }
 
 /* ── 主內容 ─────────────────────────────────────────────────────────── */
 .content {
@@ -321,6 +330,8 @@ function handleLogout() {
   padding: 28px;
   overflow-y: auto;
   min-width: 0;
+  background: var(--bg-app);
+  transition: background .2s;
 }
 
 /* ── 標題列 ─────────────────────────────────────────────────────────── */
@@ -330,7 +341,7 @@ function handleLogout() {
   flex-wrap: wrap; gap: 12px;
   margin-bottom: 20px;
 }
-.page-title { font-size: 20px; font-weight: 800; color: #1e293b; margin: 0; }
+.page-title { font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0; transition: color .2s; }
 .toolbar-actions { display: flex; flex-direction: column; gap: 8px; }
 .toolbar-row { display: flex; align-items: center; gap: 8px; }
 .date-picker { width: 160px; }
@@ -344,14 +355,15 @@ function handleLogout() {
 }
 .stat-card { border-radius: 14px; padding: 16px; color: #fff; }
 .stat-num  { font-size: 28px; font-weight: 800; line-height: 1; }
-.stat-label { font-size: 13px; opacity: .85; margin-top: 4px; }
+.stat-label { font-size: 16px; opacity: .85; margin-top: 4px; }
 
 /* ── 打卡卡片 ───────────────────────────────────────────────────────── */
 .record-list { display: flex; flex-direction: column; gap: 10px; }
 .record-card {
-  background: #fff; border-radius: 14px;
+  background: var(--bg-card); border-radius: 14px;
   padding: 14px 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  transition: background .2s;
 }
 .rec-top {
   display: flex; align-items: center;
@@ -365,7 +377,7 @@ function handleLogout() {
   display: grid; place-items: center;
   font-size: 16px; font-weight: 700; flex-shrink: 0;
 }
-.rec-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+.rec-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 
 /* 桌機時間（右側） */
 .desktop-times { display: flex; align-items: center; gap: 12px; }
@@ -375,18 +387,20 @@ function handleLogout() {
   display: flex; flex-direction: column;
   align-items: center; gap: 2px; min-width: 52px;
 }
-.tl { font-size: 12px; color: #94a3b8; }
-.tv { font-size: 15px; font-weight: 700; color: #1e293b; }
-.tv.dim { color: #cbd5e1; }
-.tdiv { width: 1px; height: 32px; background: #f1f5f9; }
+.tl { font-size: 16px; color: #94a3b8; }
+.tv { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.tv.dim { color: var(--text-muted); }
+.tdiv { width: 1px; height: 32px; background: var(--divider); }
 
 /* 手機時間（底部橫排） */
 .mobile-time-item {
   display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center;
 }
-.mobile-time-item .tl { font-size: 12px; color: #94a3b8; }
-.mobile-time-item .tv { font-size: 15px; font-weight: 700; color: #1e293b; }
-.tdiv-v { width: 1px; height: 24px; background: #f1f5f9; }
+.mobile-time-item .tl { font-size: 16px; color: #94a3b8; }
+.mobile-time-item .tv { font-size: 16px; font-weight: 700; color: #1e293b; }
+.tdiv-v { width: 1px; height: 24px; background: var(--divider); }
+.icon-btn { padding: 4px !important; min-width: 0 !important; color: #94a3b8 !important; }
+.theme-btn { padding: 6px !important; min-width: 0 !important; color: var(--text-muted) !important; }
 
 /* ── 底部導覽（手機）──────────────────────────────────────────────── */
 .bottom-nav { display: none; }
@@ -406,7 +420,7 @@ function handleLogout() {
     align-items: center; justify-content: center;
     gap: 3px; padding: 10px 0;
     color: #64748b; text-decoration: none;
-    font-size: 12px; background: none; border: none; cursor: pointer;
+    font-size: 16px; background: none; border: none; cursor: pointer;
     transition: color .15s;
   }
   .bn-item:hover, .bn-item.bn-active { color: #3b82f6; }
@@ -436,13 +450,13 @@ function handleLogout() {
     align-items: center;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--divider);
   }
 }
 
 @media (max-width: 375px) {
   .content { padding: 12px 10px; padding-bottom: 80px; }
   .stat-num { font-size: 22px; }
-  .rec-name { font-size: 13px; }
+  .rec-name { font-size: 16px; }
 }
 </style>

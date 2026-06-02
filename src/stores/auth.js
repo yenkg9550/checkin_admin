@@ -14,6 +14,13 @@ export const useAuthStore = defineStore('auth', () => {
   const displayName  = computed(() => user.value?.display_name || '')
   const pictureUrl   = computed(() => user.value?.picture_url  || '')
 
+  // super_admin 擁有全部權限；一般 admin 依 permissions 陣列判斷
+  function hasPermission(key) {
+    if (!user.value) return false
+    if (user.value.role === 'super_admin') return true
+    return (user.value.permissions ?? []).includes(key)
+  }
+
   function setAuth(accessToken, userInfo) {
     token.value = accessToken
     user.value  = userInfo
@@ -28,5 +35,5 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.removeItem(USER_KEY)
   }
 
-  return { token, user, isLoggedIn, isAdmin, isSuperAdmin, displayName, pictureUrl, setAuth, logout }
+  return { token, user, isLoggedIn, isAdmin, isSuperAdmin, displayName, pictureUrl, hasPermission, setAuth, logout }
 })

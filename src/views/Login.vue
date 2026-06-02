@@ -122,7 +122,7 @@ async function handleLogin() {
   margin: 0 0 6px;
 }
 .subtitle {
-  font-size: 13px;
+  font-size: 16px;
   color: #64748b;
   margin: 0;
 }
@@ -135,7 +135,7 @@ async function handleLogin() {
 .field { margin-bottom: 16px; }
 .field label {
   display: block;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
   color: #94a3b8;
   margin-bottom: 6px;
@@ -150,7 +150,7 @@ async function handleLogin() {
   border-radius: 10px;
   padding: 10px 14px;
   color: #f1f5f9;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.15s;
 }
@@ -158,7 +158,7 @@ async function handleLogin() {
 .field input:disabled { opacity: 0.5; cursor: not-allowed; }
 .field input::placeholder { color: #475569; }
 .error-text {
-  font-size: 13px;
+  font-size: 16px;
   color: #f87171;
   margin: 0 0 14px;
   text-align: center;
@@ -170,7 +170,7 @@ async function handleLogin() {
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   margin-top: 4px;
