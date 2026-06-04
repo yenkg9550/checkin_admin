@@ -14,7 +14,6 @@ LINE 打卡系統的管理後台，使用 Vue 3 + Element Plus，提供出勤管
 ## 快速開始
 
 ```bash
-cd /Users/caramel/Desktop/F2E/checkIn/admin
 npm install
 npm run dev     # 開發：http://localhost:5174
 npm run build   # 打包
@@ -40,11 +39,7 @@ VITE_API_BASE=http://localhost:8000/api/v1
 
 ## 登入帳號
 
-後端首次啟動時會自動建立超級管理員帳號：
-
-| 帳號 | 密碼 | 角色 |
-|------|------|------|
-| `superadmin` | `changeme123` | 超級管理員 |
+後端首次啟動時會依 `.env` 的 `SUPER_ADMIN_USERNAME` / `SUPER_ADMIN_PASSWORD` 自動建立超級管理員帳號。
 
 > 請在首次登入後立即至「管理者管理」頁面修改密碼。
 

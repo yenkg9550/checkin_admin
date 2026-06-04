@@ -588,6 +588,12 @@ async function removeHoliday(id) {
 .chip-check-emp { font-size: 15px; color: #3b82f6; font-weight: 700; }
 .emp-lt-actions { margin-top: 4px; }
 
+/* 新增特別假日 Dialog input 白底 */
+.el-dialog :deep(.el-input__wrapper),
+.el-dialog :deep(.el-date-editor.el-input__wrapper) {
+  background: #ffffff !important;
+}
+
 /* 特別假日 */
 .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
 .holiday-list { display: flex; flex-direction: column; gap: 8px; max-width: 680px; }

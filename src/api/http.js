@@ -17,8 +17,12 @@ http.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
+      const msg = err.response?.data?.detail || ''
       sessionStorage.removeItem(TOKEN_KEY)
       sessionStorage.removeItem('admin_user')
+      if (msg.includes('其他裝置')) {
+        alert('此帳號已在其他裝置登入，您已被登出。')
+      }
       window.location.hash = '#/login'
     }
     return Promise.reject(err)
