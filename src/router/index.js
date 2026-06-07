@@ -16,23 +16,25 @@ import Positions        from '@/views/Positions.vue'
 import PayrollDetail    from '@/views/PayrollDetail.vue'
 import AnomalyReport    from '@/views/AnomalyReport.vue'
 import AttendanceList   from '@/views/AttendanceList.vue'
+import PunchRequests    from '@/views/PunchRequests.vue'
 
 // permission key 對應到各路由（super_admin 不受限制）
 const ROUTE_PERMISSION = {
-  dashboard:   'attendance',
-  employees:   'employees',
-  leaveTypes:  'employees',
-  schedule:    'schedule',
-  export:      'export',
-  settings:    'settings',
+  dashboard:      'attendance',
+  employees:      'employees',
+  leaveTypes:     'employees',
+  schedule:       'schedule',
+  export:         'export',
+  settings:       'settings',
   salaryConfig:    'salary',
   payroll:         'salary',
   overrideRecords: 'employees',
+  punchRequests:   'attendance',
   payrollExport:   'salary',
   payrollDetail:   'salary',
   positions:       'employees',
-  anomalyReport:      'attendance',
-  attendanceList:     'attendance',
+  anomalyReport:   'attendance',
+  attendanceList:  'attendance',
   // admins 頁僅 super_admin 可見（不在此表，由 isSuperAdmin 判斷）
 }
 
@@ -58,6 +60,7 @@ const routes = [
       { path: 'positions',        name: 'positions',         component: Positions,        meta: { title: '職位設定' } },
       { path: 'anomaly-report',    name: 'anomalyReport',     component: AnomalyReport,    meta: { title: '異常報告' } },
       { path: 'attendance-list',  name: 'attendanceList',    component: AttendanceList,   meta: { title: '出勤紀錄' } },
+      { path: 'punch-requests',   name: 'punchRequests',     component: PunchRequests,    meta: { title: '申請打卡列表' } },
     ],
   },
 ]

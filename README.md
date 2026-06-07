@@ -41,14 +41,6 @@ VITE_API_BASE=http://localhost:8000/api/v1
 
 後端首次啟動時會依 `.env` 的 `SUPER_ADMIN_USERNAME` / `SUPER_ADMIN_PASSWORD` 自動建立超級管理員帳號。
 
-> 請在首次登入後立即至「管理者管理」頁面修改密碼。
-
-## 管理員角色
-
-| 角色 | 權限 |
-|------|------|
-| `super_admin` | 可新增、刪除管理員，修改任何人的密碼，不可被刪除 |
-| `admin` | 可使用所有後台功能，只能修改自己的密碼 |
 
 ## 一鍵 Commit 與自動推送
 

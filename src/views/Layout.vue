@@ -21,7 +21,7 @@ const isEmployeesRoute = computed(() => ['/employees', '/leave-types', '/salary-
 watch(isEmployeesRoute, v => { if (v) employeesOpen.value = true }, { immediate: true })
 
 const attendanceOpen    = ref(false)
-const isAttendanceRoute = computed(() => ['/dashboard', '/export', '/override-records', '/anomaly-report', '/attendance-list'].includes(route.path))
+const isAttendanceRoute = computed(() => ['/dashboard', '/export', '/override-records', '/anomaly-report', '/attendance-list', '/punch-requests'].includes(route.path))
 watch(isAttendanceRoute, v => { if (v) attendanceOpen.value = true }, { immediate: true })
 
 const payrollOpen    = ref(false)
@@ -64,6 +64,9 @@ function handleLogout() {
               </router-link>
               <router-link v-if="auth.hasPermission('employees')" to="/override-records" class="nav-sub-item" active-class="sub-active">
                 <el-icon><AlarmClock /></el-icon> 補打卡紀錄
+              </router-link>
+              <router-link to="/punch-requests" class="nav-sub-item" active-class="sub-active">
+                <el-icon><Checked /></el-icon> 申請打卡列表
               </router-link>
               <router-link to="/anomaly-report" class="nav-sub-item" active-class="sub-active">
                 <el-icon><WarnTriangleFilled /></el-icon> 異常報告

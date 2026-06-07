@@ -81,10 +81,7 @@
         </el-form-item>
         <el-divider>加班</el-divider>
         <el-form-item label="加班計算">
-          <el-radio-group v-model="form.overtime_mode">
-            <el-radio value="none">無</el-radio>
-            <el-radio value="custom">自訂</el-radio>
-          </el-radio-group>
+          <el-switch v-model="form.overtime_mode" active-value="custom" inactive-value="none" />
         </el-form-item>
         <template v-if="form.overtime_mode === 'custom'">
           <el-form-item label="加班門檻 (h)">
@@ -100,34 +97,52 @@
         </template>
         <el-divider>特別假日</el-divider>
         <el-form-item label="特別假日加給">
-          <el-radio-group v-model="form.holiday_mode">
-            <el-radio value="none">無</el-radio>
-            <el-radio value="custom">自訂</el-radio>
-          </el-radio-group>
+          <el-switch v-model="form.holiday_mode" active-value="custom" inactive-value="none" />
         </el-form-item>
         <el-form-item v-if="form.holiday_mode === 'custom'" label="特別假日倍率">
           <el-input-number v-model="form.holiday_rate" :min="1" :max="5" :step="0.1" :precision="1" style="width:150px" />
         </el-form-item>
         <el-divider>遲到 / 早退扣款</el-divider>
-        <el-form-item label="遲到扣款方式">
-          <el-select v-model="form.deduction_type" style="width:160px">
-            <el-option label="無" value="none" />
-            <el-option label="每分鐘扣" value="per_minute" />
-            <el-option label="每次固定扣" value="fixed" />
-            <el-option label="兩者並用" value="both" />
-          </el-select>
+        <el-form-item label="啟用扣款">
+          <el-switch
+            :model-value="form.deduction_type !== 'none'"
+            @change="v => form.deduction_type = v ? 'per_minute' : 'none'"
+          />
         </el-form-item>
-        <el-form-item
-          v-if="form.deduction_type !== 'fixed' && form.deduction_type !== 'none'"
-          label="每分鐘扣 (元)"
-        >
-          <el-input-number v-model="form.deduction_per_minute" :min="1" :step="1" style="width:150px" />
+        <template v-if="form.deduction_type !== 'none'">
+          <el-form-item label="扣款方式">
+            <el-select v-model="form.deduction_type" style="width:160px">
+              <el-option label="每分鐘扣" value="per_minute" />
+              <el-option label="每次固定扣" value="fixed" />
+              <el-option label="兩者並用" value="both" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="form.deduction_type !== 'fixed'" label="每分鐘扣 (元)">
+            <el-input-number v-model="form.deduction_per_minute" :min="1" :step="1" style="width:150px" />
+          </el-form-item>
+          <el-form-item v-if="form.deduction_type !== 'per_minute'" label="固定扣款 (元)">
+            <el-input-number v-model="form.deduction_fixed" :min="1" :step="1" style="width:150px" />
+          </el-form-item>
+        </template>
+
+        <el-divider>勞健保 / 勞退自提</el-divider>
+
+        <el-form-item label="勞健保扣除">
+          <el-switch v-model="form.insurance_enabled" />
+          <span style="margin-left:12px;font-size:13px;color:var(--text-muted)">由薪資自動扣除員工負擔部分</span>
         </el-form-item>
-        <el-form-item
-          v-if="form.deduction_type !== 'per_minute' && form.deduction_type !== 'none'"
-          label="固定扣款 (元)"
-        >
-          <el-input-number v-model="form.deduction_fixed" :min="1" :step="1" style="width:150px" />
+        <el-form-item v-if="form.insurance_enabled" label="勞健保比例">
+          <el-input-number v-model="form.insurance_rate" :min="0.1" :max="20" :step="0.1" :precision="1" style="width:130px" />
+          <span style="margin-left:8px;font-size:13px;color:var(--text-muted)">% （勞基法約 5–6%）</span>
+        </el-form-item>
+
+        <el-form-item label="勞退自提">
+          <el-switch v-model="form.pension_enabled" />
+          <span style="margin-left:12px;font-size:13px;color:var(--text-muted)">員工自願提撥（勞基法上限 6%）</span>
+        </el-form-item>
+        <el-form-item v-if="form.pension_enabled" label="自提比例">
+          <el-input-number v-model="form.pension_rate" :min="1" :max="6" :step="1" :precision="0" style="width:130px" />
+          <span style="margin-left:8px;font-size:13px;color:var(--text-muted)">%</span>
         </el-form-item>
       </el-form>
 
@@ -170,6 +185,10 @@ const DEFAULT_FORM = () => ({
   holiday_mode: 'none',
   holiday_rate: 2.0,
   monthly_work_hours: 174,
+  insurance_enabled: false,
+  insurance_rate: 6.0,
+  pension_enabled: false,
+  pension_rate: 6.0,
 })
 
 const form = reactive(DEFAULT_FORM())

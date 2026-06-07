@@ -54,9 +54,17 @@
           </el-table-column>
           <el-table-column label="扣款" align="right" min-width="80">
             <template #default="{ row }">
-              <span :class="row.deductions > 0 ? 'deduct' : ''">
-                {{ row.deductions > 0 ? '-' : '' }}{{ row.deductions.toLocaleString() }}
-              </span>
+              <el-tooltip v-if="row.deductions > 0" placement="top">
+                <template #content>
+                  <div v-if="row.insurance_deduction > 0">勞健保：{{ row.insurance_deduction.toLocaleString() }}</div>
+                  <div v-if="row.pension_deduction > 0">自提：{{ row.pension_deduction.toLocaleString() }}</div>
+                  <div v-if="(row.deductions - (row.insurance_deduction||0) - (row.pension_deduction||0)) > 0">
+                    遲到/早退：{{ (row.deductions - (row.insurance_deduction||0) - (row.pension_deduction||0)).toLocaleString() }}
+                  </div>
+                </template>
+                <span class="deduct">-{{ row.deductions.toLocaleString() }}</span>
+              </el-tooltip>
+              <span v-else>0</span>
             </template>
           </el-table-column>
           <el-table-column label="合計" align="right" min-width="100">

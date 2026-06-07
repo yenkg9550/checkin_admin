@@ -55,6 +55,11 @@ export const updateAdminPermissions   = (id, permissions)       => http.patch(`/
 export const deleteEmployee      = (id)               => http.delete(`/admin/employees/${id}`).then(r => r.data)
 export const fetchOverrides      = (params = {})      => http.get('/admin/overrides', { params }).then(r => r.data)
 
+// ── 補打卡申請審核 ─────────────────────────────────────────────────────────────
+export const fetchOverrideRequests   = (params = {})              => http.get('/admin/override-requests', { params }).then(r => r.data)
+export const approveOverrideRequest  = (id)                       => http.patch(`/admin/override-requests/${id}/approve`).then(r => r.data)
+export const rejectOverrideRequest   = (id, reject_reason = '')   => http.patch(`/admin/override-requests/${id}/reject`, { reject_reason }).then(r => r.data)
+
 // ── 職位管理 ──────────────────────────────────────────────────────────────────
 export const fetchPositions           = ()                         => http.get('/admin/positions').then(r => r.data)
 export const createPosition           = (payload)                  => http.post('/admin/positions', payload).then(r => r.data)

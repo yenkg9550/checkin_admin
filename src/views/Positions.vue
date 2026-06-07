@@ -181,10 +181,7 @@ function payTypeLabel(t) {
               <span class="unit">元</span>
             </el-form-item>
             <el-form-item label="加班計算">
-              <el-radio-group v-model="form.overtime_mode">
-                <el-radio value="none">無</el-radio>
-                <el-radio value="custom">自訂</el-radio>
-              </el-radio-group>
+              <el-switch v-model="form.overtime_mode" active-value="custom" inactive-value="none" />
             </el-form-item>
             <template v-if="form.overtime_mode === 'custom'">
               <el-form-item label="加班門檻">
@@ -201,32 +198,36 @@ function payTypeLabel(t) {
               </el-form-item>
             </template>
             <el-form-item label="特別假日加給">
-              <el-radio-group v-model="form.holiday_mode">
-                <el-radio value="none">無</el-radio>
-                <el-radio value="custom">自訂</el-radio>
-              </el-radio-group>
+              <el-switch v-model="form.holiday_mode" active-value="custom" inactive-value="none" />
             </el-form-item>
             <el-form-item v-if="form.holiday_mode === 'custom'" label="特別假日倍率">
               <el-input-number v-model="form.holiday_rate" :min="1" :step="0.25" :precision="2" style="width:120px" />
               <span class="unit">倍</span>
             </el-form-item>
 
-            <el-form-item label="遲到扣款方式">
-              <el-select v-model="form.deduction_type" style="width:160px">
-                <el-option label="無" value="none" />
-                <el-option label="按分鐘扣" value="per_minute" />
-                <el-option label="固定金額" value="fixed" />
-                <el-option label="兩者並用" value="both" />
-              </el-select>
+            <el-form-item label="啟用扣款">
+              <el-switch
+                :model-value="form.deduction_type !== 'none'"
+                @change="v => form.deduction_type = v ? 'per_minute' : 'none'"
+              />
             </el-form-item>
-            <el-form-item label="每分鐘扣款" v-if="form.deduction_type !== 'fixed' && form.deduction_type !== 'none'">
-              <el-input-number v-model="form.deduction_per_minute" :min="1" :precision="0" style="width:130px" />
-              <span class="unit">元 / 分鐘</span>
-            </el-form-item>
-            <el-form-item label="固定扣款" v-if="form.deduction_type !== 'per_minute' && form.deduction_type !== 'none'">
-              <el-input-number v-model="form.deduction_fixed" :min="1" style="width:130px" />
-              <span class="unit">元 / 次</span>
-            </el-form-item>
+            <template v-if="form.deduction_type !== 'none'">
+              <el-form-item label="扣款方式">
+                <el-select v-model="form.deduction_type" style="width:160px">
+                  <el-option label="按分鐘扣" value="per_minute" />
+                  <el-option label="固定金額" value="fixed" />
+                  <el-option label="兩者並用" value="both" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="每分鐘扣款" v-if="form.deduction_type !== 'fixed'">
+                <el-input-number v-model="form.deduction_per_minute" :min="1" :precision="0" style="width:130px" />
+                <span class="unit">元 / 分鐘</span>
+              </el-form-item>
+              <el-form-item label="固定扣款" v-if="form.deduction_type !== 'per_minute'">
+                <el-input-number v-model="form.deduction_fixed" :min="1" style="width:130px" />
+                <span class="unit">元 / 次</span>
+              </el-form-item>
+            </template>
           </el-form>
         </el-tab-pane>
 
