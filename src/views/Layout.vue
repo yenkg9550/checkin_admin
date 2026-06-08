@@ -17,7 +17,7 @@ const isSettingsRoute = computed(() => route.path === '/settings')
 watch(isSettingsRoute, v => { if (v) settingsOpen.value = true }, { immediate: true })
 
 const employeesOpen    = ref(false)
-const isEmployeesRoute = computed(() => ['/employees', '/leave-types', '/salary-config', '/positions'].includes(route.path))
+const isEmployeesRoute = computed(() => ['/employees', '/leave-types', '/salary-config', '/positions', '/leave-requests'].includes(route.path))
 watch(isEmployeesRoute, v => { if (v) employeesOpen.value = true }, { immediate: true })
 
 const attendanceOpen    = ref(false)
@@ -95,6 +95,9 @@ function handleLogout() {
               </router-link>
               <router-link to="/positions" class="nav-sub-item" active-class="sub-active">
                 <el-icon><OfficeBuilding /></el-icon> 職位設定
+              </router-link>
+              <router-link to="/leave-requests" class="nav-sub-item" active-class="sub-active">
+                <el-icon><Document /></el-icon> 申請請假列表
               </router-link>
             </div>
           </transition>

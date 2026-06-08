@@ -17,6 +17,7 @@ import PayrollDetail    from '@/views/PayrollDetail.vue'
 import AnomalyReport    from '@/views/AnomalyReport.vue'
 import AttendanceList   from '@/views/AttendanceList.vue'
 import PunchRequests    from '@/views/PunchRequests.vue'
+import LeaveRequests    from '@/views/LeaveRequests.vue'
 
 // permission key 對應到各路由（super_admin 不受限制）
 const ROUTE_PERMISSION = {
@@ -30,6 +31,7 @@ const ROUTE_PERMISSION = {
   payroll:         'salary',
   overrideRecords: 'employees',
   punchRequests:   'attendance',
+  leaveRequests:   'employees',
   payrollExport:   'salary',
   payrollDetail:   'salary',
   positions:       'employees',
@@ -61,6 +63,7 @@ const routes = [
       { path: 'anomaly-report',    name: 'anomalyReport',     component: AnomalyReport,    meta: { title: '異常報告' } },
       { path: 'attendance-list',  name: 'attendanceList',    component: AttendanceList,   meta: { title: '出勤紀錄' } },
       { path: 'punch-requests',   name: 'punchRequests',     component: PunchRequests,    meta: { title: '申請打卡列表' } },
+      { path: 'leave-requests',   name: 'leaveRequests',     component: LeaveRequests,    meta: { title: '申請請假列表' } },
     ],
   },
 ]
