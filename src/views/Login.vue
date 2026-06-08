@@ -10,6 +10,7 @@ const auth = useAuthStore()
 const form = ref({ username: '', password: '' })
 const loading = ref(false)
 const error = ref('')
+const showPassword = ref(false)
 
 async function handleLogin() {
   if (!form.value.username || !form.value.password) {
@@ -60,13 +61,28 @@ async function handleLogin() {
         </div>
         <div class="field">
           <label>密碼</label>
-          <input
-            v-model="form.password"
-            type="password"
-            placeholder="請輸入密碼"
-            autocomplete="current-password"
-            :disabled="loading"
-          />
+          <div class="pw-wrap">
+            <input
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="請輸入密碼"
+              autocomplete="current-password"
+              :disabled="loading"
+            />
+            <button type="button" class="eye-btn" @click="showPassword = !showPassword" tabindex="-1">
+              <!-- 眼睛睜開 -->
+              <svg v-if="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- 眼睛閉起 -->
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <p v-if="error" class="error-text">{{ error }}</p>
         <button type="submit" class="login-btn" :disabled="loading">
@@ -157,6 +173,15 @@ async function handleLogin() {
 .field input:focus { border-color: #3b82f6; }
 .field input:disabled { opacity: 0.5; cursor: not-allowed; }
 .field input::placeholder { color: #475569; }
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 42px; }
+.eye-btn {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: #475569; padding: 0; line-height: 0;
+  transition: color .15s;
+}
+.eye-btn:hover { color: #94a3b8; }
 .error-text {
   font-size: 16px;
   color: #f87171;
