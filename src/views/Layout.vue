@@ -13,7 +13,7 @@ const router = useRouter()
 const route  = useRoute()
 
 const settingsOpen    = ref(false)
-const isSettingsRoute = computed(() => route.path === '/settings')
+const isSettingsRoute = computed(() => ['/settings', '/reset-data'].includes(route.path))
 watch(isSettingsRoute, v => { if (v) settingsOpen.value = true }, { immediate: true })
 
 const employeesOpen    = ref(false)
@@ -145,6 +145,9 @@ function handleLogout() {
               <router-link to="/settings" class="nav-sub-item" active-class="sub-active">
                 <el-icon><Location /></el-icon> 打卡設定
               </router-link>
+              <router-link v-if="auth.isSuperAdmin" to="/reset-data" class="nav-sub-item nav-sub-danger" active-class="sub-active">
+                <el-icon><Delete /></el-icon> 重置資料
+              </router-link>
             </div>
           </transition>
         </template>
@@ -249,6 +252,8 @@ function handleLogout() {
 }
 .nav-sub-item:hover { background: #334155; color: #cbd5e1; }
 .nav-sub-item.sub-active { background: rgba(59,130,246,0.2); color: #60a5fa; font-weight: 600; }
+.nav-sub-danger { color: #f87171; }
+.nav-sub-danger:hover { background: rgba(239,68,68,0.15); color: #fca5a5; }
 .sub-fade-enter-active, .sub-fade-leave-active { transition: opacity .15s, transform .15s; }
 .sub-fade-enter-from, .sub-fade-leave-to { opacity: 0; transform: translateY(-4px); }
 

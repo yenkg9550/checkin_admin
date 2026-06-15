@@ -18,6 +18,7 @@ import AnomalyReport    from '@/views/AnomalyReport.vue'
 import AttendanceList   from '@/views/AttendanceList.vue'
 import PunchRequests    from '@/views/PunchRequests.vue'
 import LeaveRequests    from '@/views/LeaveRequests.vue'
+import ResetData        from '@/views/ResetData.vue'
 
 // permission key 對應到各路由（super_admin 不受限制）
 const ROUTE_PERMISSION = {
@@ -64,6 +65,7 @@ const routes = [
       { path: 'attendance-list',  name: 'attendanceList',    component: AttendanceList,   meta: { title: '出勤紀錄' } },
       { path: 'punch-requests',   name: 'punchRequests',     component: PunchRequests,    meta: { title: '申請打卡列表' } },
       { path: 'leave-requests',   name: 'leaveRequests',     component: LeaveRequests,    meta: { title: '申請請假列表' } },
+      { path: 'reset-data',       name: 'resetData',         component: ResetData,        meta: { title: '重置資料' } },
     ],
   },
 ]
@@ -82,8 +84,8 @@ router.beforeEach((to) => {
   if (to.name === 'login' && token) return { name: 'dashboard' }
   if (!to.meta.public && !isAdmin)  return { name: 'login' }
 
-  // admins 頁僅 super_admin 可進入
-  if (to.name === 'admins' && !isSuperAdmin) return { name: 'dashboard' }
+  // admins / resetData 頁僅 super_admin 可進入
+  if (['admins', 'resetData'].includes(to.name) && !isSuperAdmin) return { name: 'dashboard' }
 
   // 一般 admin：依權限攔截（dashboard 本身不擋，避免無限迴圈）
   if (!isSuperAdmin && to.name && to.name !== 'dashboard' && ROUTE_PERMISSION[to.name]) {

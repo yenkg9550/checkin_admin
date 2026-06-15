@@ -134,3 +134,5 @@ export const fetchSchedules     = (year, month)   => http.get('/admin/schedule/'
 export const createSchedule     = (payload)       => http.post('/admin/schedule/', payload).then(r => r.data)
 export const deleteSchedule     = (id)            => http.delete(`/admin/schedule/${id}`).then(r => r.data)
 export const toggleScheduleOT   = (id)            => http.patch(`/admin/schedule/${id}/overtime`).then(r => r.data)
+
+export const resetAllData = () => http.post('/admin/reset-all').then(r => r.data)
