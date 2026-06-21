@@ -19,6 +19,7 @@ import AttendanceList   from '@/views/AttendanceList.vue'
 import PunchRequests    from '@/views/PunchRequests.vue'
 import LeaveRequests    from '@/views/LeaveRequests.vue'
 import ResetData        from '@/views/ResetData.vue'
+import SeedTestData     from '@/views/SeedTestData.vue'
 
 // permission key 對應到各路由（super_admin 不受限制）
 const ROUTE_PERMISSION = {
@@ -66,6 +67,7 @@ const routes = [
       { path: 'punch-requests',   name: 'punchRequests',     component: PunchRequests,    meta: { title: '申請打卡列表' } },
       { path: 'leave-requests',   name: 'leaveRequests',     component: LeaveRequests,    meta: { title: '申請請假列表' } },
       { path: 'reset-data',       name: 'resetData',         component: ResetData,        meta: { title: '重置資料' } },
+      { path: 'seed-test-data',   name: 'seedTestData',      component: SeedTestData,     meta: { title: '加入測試資料' } },
     ],
   },
 ]

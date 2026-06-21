@@ -136,3 +136,4 @@ export const deleteSchedule     = (id)            => http.delete(`/admin/schedul
 export const toggleScheduleOT   = (id)            => http.patch(`/admin/schedule/${id}/overtime`).then(r => r.data)
 
 export const resetAllData = () => http.post('/admin/reset-all').then(r => r.data)
+export const seedTestData = () => http.post('/admin/seed-test-data').then(r => r.data)

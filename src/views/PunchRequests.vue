@@ -229,7 +229,7 @@ function formatDt(iso) {
   display: flex; align-items: center; gap: 12px;
   margin-bottom: 16px;
 }
-.record-hint { font-size: 14px; color: var(--text-muted); }
+.record-hint { font-size: 16px; color: var(--text-muted); }
 
 /* 桌機表格 */
 .table-wrap {
@@ -237,11 +237,11 @@ function formatDt(iso) {
   border: 1px solid var(--border-color); overflow: hidden;
   min-height: 200px; transition: background .2s, border-color .2s;
 }
-.req-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.req-table { width: 100%; border-collapse: collapse; font-size: 16px; }
 .req-table thead tr { background: var(--bg-inner); }
 .req-table th {
   padding: 13px 16px; text-align: left;
-  font-weight: 700; font-size: 14px; color: var(--text-muted);
+  font-weight: 700; font-size: 16px; color: var(--text-muted);
   border-bottom: 1px solid var(--border-color);
 }
 .req-table tbody tr { border-bottom: 1px solid var(--divider); transition: background .15s; }
@@ -254,11 +254,11 @@ function formatDt(iso) {
 .avatar-ph {
   width: 32px; height: 32px; border-radius: 50%;
   background: linear-gradient(135deg,#3b82f6,#1d4ed8);
-  color: #fff; font-size: 14px; font-weight: 700;
+  color: #fff; font-size: 16px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .emp-name { font-weight: 600; color: var(--text-primary); }
-.mono { font-family: monospace; font-size: 13px; }
+.mono { font-family: monospace; font-size: 16px; }
 .muted { color: var(--text-muted); }
 .reason { max-width: 260px; word-break: break-word; }
 .reject-hint { font-size: 12px; color: #ef4444; margin-top: 4px; }
@@ -275,9 +275,9 @@ function formatDt(iso) {
   transition: background .2s, border-color .2s;
 }
 .card-top { display: flex; align-items: center; justify-content: space-between; }
-.card-row { display: flex; gap: 10px; font-size: 14px; color: var(--text-secondary); align-items: flex-start; }
+.card-row { display: flex; gap: 10px; font-size: 16px; color: var(--text-secondary); align-items: flex-start; }
 .card-row .label { color: var(--text-muted); font-weight: 600; min-width: 42px; }
-.card-row.muted { color: var(--text-muted); font-size: 12px; }
+.card-row.muted { color: var(--text-muted); font-size: 16px; }
 .card-actions { display: flex; gap: 8px; margin-top: 4px; }
 
 @media (max-width: 768px) {
