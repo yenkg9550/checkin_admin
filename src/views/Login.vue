@@ -7,7 +7,7 @@ import { postAdminLogin } from '@/api/http.js'
 const router = useRouter()
 const auth = useAuthStore()
 
-const form = ref({ username: '', password: '' })
+const form = ref({ username: 'superadmin', password: 'admin123' })
 const loading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
