@@ -319,7 +319,7 @@ onMounted(loadAdmins)
               {{ p.label }}
             </label>
           </div>
-yj        </el-form-item>
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="createVisible = false">取消</el-button>
